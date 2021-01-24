@@ -1075,7 +1075,11 @@ WorkitemLoops::GetContextArray(llvm::Instruction *instruction,
 
       size_t sizeBits;
 #ifndef LLVM_OLDER_THAN_7_0
+#  ifdef LLVM_12_0
+      sizeBits = Alloca->getAllocationSizeInBits(M->getDataLayout())->getFixedSize();
+#  else
       sizeBits = Alloca->getAllocationSizeInBits(M->getDataLayout()).getValueOr(0);
+#  endif
       assert(sizeBits != 0);
 #endif
       // if (size == 0) WGLocalSizeX * WGLocalSizeY * WGLocalSizeZ * 8 *
