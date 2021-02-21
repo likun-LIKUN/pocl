@@ -370,8 +370,9 @@ else()
   endfunction()
 endif()
 
+find_package(PkgConfig MODULE REQUIRED)
+
 if(UNIX AND (NOT CMAKE_CROSSCOMPILING))
-  find_package(PkgConfig MODULE REQUIRED)
   find_package(Hwloc)
 
   if(NOT Hwloc_FOUND)
