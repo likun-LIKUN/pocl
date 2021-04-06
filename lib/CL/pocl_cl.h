@@ -764,6 +764,9 @@ struct _cl_device_id {
   /* A running number (starting from zero) across all the device instances.
      Used for indexing arrays in data structures with device specific
      entries. */
+  const char* llvm_abi;
+  const char* llvm_float_abi;
+  const char* llvm_features;
   int dev_id;
   int global_mem_id; /* identifier for device global memory */
   /* pointer to an accounting struct for global memory */

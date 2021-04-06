@@ -1568,6 +1568,9 @@ pocl_init_default_device_infos (cl_device_id dev)
   dev->llvm_target_triplet = OCL_KERNEL_TARGET;
 #ifdef HOST_CPU_FORCED
   dev->llvm_cpu = OCL_KERNEL_TARGET_CPU;
+  dev->llvm_abi = OCL_KERNEL_TARGET_ABI;
+  dev->llvm_float_abi = OCL_KERNEL_TARGET_FLOAT_ABI;
+  dev->llvm_features = OCL_KERNEL_TARGET_FEATURES;
 #else
   dev->llvm_cpu = get_llvm_cpu_name ();
 #endif

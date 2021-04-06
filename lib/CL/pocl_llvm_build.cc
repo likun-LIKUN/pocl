@@ -363,8 +363,26 @@ int pocl_llvm_build_program(cl_program program,
   // This is required otherwise the initialization fails with
   // unknown triple ''
   ss << "-triple=" << device->llvm_target_triplet << " ";
-  if (device->llvm_cpu != NULL)
-    ss << "-target-cpu " << device->llvm_cpu << " ";
+
+  if (device->llvm_cpu != NULL) {
+    if (strlen(device->llvm_cpu) > 0) {
+      ss << "-target-cpu " << device->llvm_cpu << " ";
+    }
+    else {
+      std::cerr << "Warning: target-cpu is set to empty string, "
+                << "it is ignored."<< std::endl;
+    }
+  }
+
+  if (device->llvm_features != NULL) {
+    if (strlen(device->llvm_features) > 0) {
+      ss << "-target-feature " << device->llvm_features << " ";
+    }
+    else {
+      std::cerr << "Warning: target-feature is set to empty string, "
+                << "it is ignored."<< std::endl;
+    }
+  }
 
   POCL_MSG_PRINT_LLVM("all build options: %s\n", ss.str().c_str());
 
@@ -483,11 +501,16 @@ int pocl_llvm_build_program(cl_program program,
   po.Includes.push_back(KernelH);
   clang::TargetOptions &ta = pocl_build.getTargetOpts();
   ta.Triple = device->llvm_target_triplet;
+
   if (device->llvm_cpu != NULL)
     ta.CPU = device->llvm_cpu;
 
+  if (device->llvm_abi != NULL)
+    ta.ABI = device->llvm_abi;
+
 #ifdef DEBUG_POCL_LLVM_API
   std::cout << "### Triple: " << ta.Triple.c_str() <<  ", CPU: " << ta.CPU.c_str();
+  std::cout << "### ABI: " << ta.ABI.c_str() <<  ", CPU: " << ta.CPU.c_str();
 #endif
   CI.createDiagnostics(diagsBuffer, false);
 
