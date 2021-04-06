@@ -145,7 +145,7 @@ static TargetMachine *GetTargetMachine(cl_device_id device, Triple &triple) {
   if (FABI.size() > 0) {
     // The abi string only match "hard" or "soft", so the string size must be 4.
     if (FABI.size() == 4) {
-      transform(FABI.begin(),FABI.end(),FABI.begin(),::tolower);
+      transform(FABI.begin(), FABI.end(), FABI.begin(), ::tolower);
       if (FABI.compare("hard") == 0) {
         TGOptions.FloatABIType = FloatABI::Hard;
       }
