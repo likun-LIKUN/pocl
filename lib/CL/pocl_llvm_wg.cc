@@ -93,18 +93,6 @@ static std::map<cl_device_id, PassManager *> kernelPasses;
 // This is used to control the kernel we process in the kernel compilation.
 extern cl::opt<std::string> KernelName;
 
-/* FIXME: these options should come from the cl_device, and
- * cl_program's options. */
-static llvm::TargetOptions GetTargetOptions() {
-  llvm::TargetOptions Options;
-#ifdef HOST_FLOAT_SOFT_ABI
-  Options.FloatABIType = FloatABI::Soft;
-#else
-  Options.FloatABIType = FloatABI::Hard;
-#endif
-  return Options;
-}
-
 void clearTargetMachines() {
   for (auto i = targetMachines.begin(), e = targetMachines.end(); i != e; ++i) {
     delete (llvm::TargetMachine *)i->second;
@@ -131,8 +119,6 @@ static TargetMachine *GetTargetMachine(cl_device_id device, Triple &triple) {
   std::string Error;
   // Triple TheTriple(device->llvm_target_triplet);
 
-  std::string MCPU = device->llvm_cpu ? device->llvm_cpu : "";
-
   const Target *TheTarget = TargetRegistry::lookupTarget("", triple, Error);
 
   // In LLVM 3.4 and earlier, the target registry falls back to
@@ -144,13 +130,48 @@ static TargetMachine *GetTargetMachine(cl_device_id device, Triple &triple) {
     return 0;
   }
 
+  std::string MCPU = device->llvm_cpu ? device->llvm_cpu : "";
+  std::string TGFeatures = device->llvm_features ? device->llvm_features : "";
+
+  llvm::TargetOptions TGOptions;
+
+  std::string MABI = device->llvm_abi ? device->llvm_abi : "";
+  if (MABI.size() > 0) {
+    TGOptions.MCOptions.ABIName = MABI;
+  }
+
+  // LLVM FloatABI
+  std::string FABI = device->llvm_float_abi ? device->llvm_float_abi : "";
+  if (FABI.size() > 0) {
+    // The abi string only match "hard" or "soft", so the string size must be 4.
+    if (FABI.size() == 4) {
+      transform(FABI.begin(), FABI.end(), FABI.begin(), ::tolower);
+      if (FABI.compare("hard") == 0) {
+        TGOptions.FloatABIType = FloatABI::Hard;
+      }
+      else if (FABI.compare("soft") == 0) {
+        TGOptions.FloatABIType = FloatABI::Soft;
+      }
+      else {
+        std::cerr << "ERROR: Invalid Float-ABI string '" << FABI
+                  << "', this only matches 'soft' or 'hard'!" << std::endl;
+        POCL_ABORT("FAIL\n");
+      }
+    }
+    else {
+      std::cerr << "ERROR: Invalid Float-ABI string '" << FABI
+                << "', this only matches 'soft' or 'hard'!" << std::endl;
+      POCL_ABORT("FAIL\n");
+    }
+  }
+
 #ifdef LLVM_OLDER_THAN_6_0
   TargetMachine *TM = TheTarget->createTargetMachine(
-      triple.getTriple(), MCPU, StringRef(""), GetTargetOptions(), Reloc::PIC_,
+      triple.getTriple(), MCPU, TGFeatures, TGOptions, Reloc::PIC_,
       CodeModel::Default, CodeGenOpt::Aggressive);
 #else
   TargetMachine *TM = TheTarget->createTargetMachine(
-      triple.getTriple(), MCPU, StringRef(""), GetTargetOptions(), Reloc::PIC_,
+      triple.getTriple(), MCPU, TGFeatures, TGOptions, Reloc::PIC_,
       CodeModel::Small, CodeGenOpt::Aggressive);
 #endif
 
