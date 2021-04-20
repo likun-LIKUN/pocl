@@ -438,7 +438,7 @@ int pocl_llvm_build_program(cl_program program,
                              clang::InputKind::OpenCL,
 #endif
                              triple,
-#ifndef LLVM_OLDER_THAN_12_0
+#ifndef LLVM_OLDER_THAN_13_0
                              po.Includes,
 #else
                              po,

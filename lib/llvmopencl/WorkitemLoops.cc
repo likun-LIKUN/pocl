@@ -1076,7 +1076,7 @@ WorkitemLoops::GetContextArray(llvm::Instruction *instruction,
       size_t sizeBits;
 #ifndef LLVM_OLDER_THAN_7_0
       sizeBits = Alloca->getAllocationSizeInBits(M->getDataLayout())
-#ifndef LLVM_OLDER_THAN_12_0
+#ifndef LLVM_OLDER_THAN_13_0
                      .getValueOr(TypeSize(0, false))
                      .getFixedValue();
 #else
