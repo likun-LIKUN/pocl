@@ -372,7 +372,8 @@ endmacro()
 
 # clang++ try-compile macro
 macro(custom_try_compile_clangxx SOURCE1 SOURCE2 RES_VAR)
-  custom_try_compile_c_cxx("${CLANGXX}" "cc" "${SOURCE1}" "${SOURCE2}" ${RES_VAR}  "-c" ${ARGN})
+  separate_arguments(CLANG_CXX_FLAGS UNIX_COMMAND "${CMAKE_CXX_FLAGS}")
+  custom_try_compile_c_cxx("${CLANGXX}" "cc" "${SOURCE1}" "${SOURCE2}" ${RES_VAR}  "-c" ${ARGN} ${CLANG_CXX_FLAGS})
 endmacro()
 
 # clang++ try-compile macro
