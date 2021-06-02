@@ -197,7 +197,7 @@ function(make_kernel_bc OUTPUT_VAR NAME SUBDIR USE_SLEEF EXTRA_BC EXTRA_CONFIG)
     set(LINK_OPT_COMMAND COMMAND "${XARGS_EXEC}" "${LLVM_LINK}" "-o" "${KERNEL_BC}" < "${BC_LIST_FILE}")
   else()
     set(LINK_CMD COMMAND "${XARGS_EXEC}" "${LLVM_LINK}" "-o" "kernel-${NAME}-unoptimized.bc" < "${BC_LIST_FILE}")
-    set(OPT_CMD COMMAND "${LLVM_OPT}" ${LLC_FLAGS} "-O3" "-fp-contract=off" "-o" "${KERNEL_BC}" "kernel-${NAME}-unoptimized.bc")
+    set(OPT_CMD COMMAND "${LLVM_OPT}" ${LLC_FLAGS} "-O3" "-march=rv64iacfd" "-fp-contract=off" "-o" "${KERNEL_BC}" "kernel-${NAME}-unoptimized.bc")
     set(LINK_OPT_COMMAND ${LINK_CMD} ${OPT_CMD})
   endif()
 

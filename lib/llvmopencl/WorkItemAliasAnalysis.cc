@@ -155,12 +155,22 @@ WorkItemAAResult::alias(const Location &LocA, const Location &LocB) {
     // pointer values are. This allows the code below to ignore this special
     // case.
     if (LocA.Size == 0 || LocB.Size == 0)
+#ifdef LLVM_OLDER_THAN_13_0
         return NoAlias;
+#else
+        return AliasResult::Kind::NoAlias;
+#endif
 
     // Pointers from different address spaces do not alias
     if (cast<PointerType>(LocA.Ptr->getType())->getAddressSpace() != 
         cast<PointerType>(LocB.Ptr->getType())->getAddressSpace()) {
+#ifdef LLVM_OLDER_THAN_13_0
         return NoAlias;
+#else
+        return AliasResult::Kind::NoAlias;
+#endif
+
+
     }
     // In case code is created by pocl, we can also use metadata.
     if (isa<Instruction>(LocA.Ptr) && isa<Instruction>(LocB.Ptr)) {
@@ -217,7 +227,13 @@ WorkItemAAResult::alias(const Location &LocA, const Location &LocB) {
                 if ( !(CIX->getValue() == CJX->getValue()
                     && CIY->getValue() == CJY->getValue()
                     && CIZ->getValue() == CJZ->getValue())) {
+#ifdef LLVM_OLDER_THAN_13_0
                     return NoAlias;
+#else
+                    return AliasResult::Kind::NoAlias;
+#endif
+
+
                 }                
             }        
         }
